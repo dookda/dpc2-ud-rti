@@ -6,7 +6,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 })
 export class DataService {
 
-  public w3: any = 'http://103.40.148.133/gs-ud/udparcel/ows?service=WFS&version=1.0.0&request=GetFeature';
+  public w3: any = 'http://cgi.uru.ac.th/geoserver/udparcel/ows?service=WFS&version=1.0.0&request=GetFeature';
+  public url: any = 'http://202.29.52.232/service/ud_parcel.php';
+  // public url: any = 'http://103.40.148.133/service/ud_parcel.php';
 
   constructor(
     private http: HttpClient
@@ -17,6 +19,28 @@ export class DataService {
     return new Promise((resolve, reject) => {
       this.http.get(this.w3 + '&typeName=udparcel:building_4326&CQL_FILTER=INTERSECTS(geom,POINT(' +
         lon + '%20' + lat + '))&outputFormat=application%2Fjson')
+        .subscribe((res: any) => {
+          resolve(res);
+        }, (error) => {
+          reject(error);
+        });
+    });
+  }
+
+  getAllParcel() {
+    return new Promise((resolve, reject) => {
+      this.http.get(this.url)
+        .subscribe((res: any) => {
+          resolve(res);
+        }, (error) => {
+          reject(error);
+        });
+    });
+  }
+
+  getLikeParcel(txt1: string, txt2: string) {
+    return new Promise((resolve, reject) => {
+      this.http.get(this.url + '?val1=' + txt1 + '&val2=' + txt2)
         .subscribe((res: any) => {
           resolve(res);
         }, (error) => {

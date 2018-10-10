@@ -17,6 +17,19 @@
 
   <div class="row">
     <div class="col col-lg-8 col-12">
+
+      <div class="my-3 p-3 bg-white rounded box-shadow">
+        <div class="media text-muted pt-3">
+          <!-- <div id="map" class="map"></div> -->
+          <div class="input-group">
+            <input [(ngModel)]="term" (ngModelChange)="searchHouse($event);" class="form-control" placeholder="ค้นหาบ้านเลขที่..">
+          </div>
+        </div>
+        <ul [hidden]="!term">
+          <li *ngFor="let a of houseData" (click)="onHouseClick(a)"><a href="#">{{a.hs_no}} ชุมชน{{a.commu_name}}</a></li>
+        </ul>
+      </div>
+
       <div class="my-3 p-3 bg-white rounded box-shadow">
         <h6 class="border-bottom border-gray pb-2 mb-0">แผนที่</h6>
         <div class="media text-muted pt-3">
@@ -31,7 +44,8 @@
           <div class="layer">
             <div>
               <label>
-                <input (change)="onCheckJson('parcel', $event.target.checked)" type="checkbox" [checked]="parcelCheck"> อาคารและสิ่งปลูกสร้าง
+                <input (change)="onCheckJson('parcel', $event.target.checked)" type="checkbox" [checked]="parcelCheck">
+                อาคารและสิ่งปลูกสร้าง
               </label>
               <div *ngIf="parcelCheck">
                 <img src="http://www.cgi.uru.ac.th/geoserver/wms?service=WMS&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=udparcel:building_4326">
@@ -40,7 +54,8 @@
 
             <div>
               <label>
-                <input (change)="onCheckJson('commu', $event.target.checked)" type="checkbox" [checked]="commuCheck"> ขอบเขตชุมชน
+                <input (change)="onCheckJson('commu', $event.target.checked)" type="checkbox" [checked]="commuCheck">
+                ขอบเขตชุมชน
               </label>
               <div *ngIf="commuCheck">
                 <img src="http://www.cgi.uru.ac.th/geoserver/wms?service=WMS&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=udparcel:boundary_comm_4326">
@@ -49,7 +64,8 @@
 
             <div>
               <label>
-                <input (change)="onCheckJson('pro', $event.target.checked)" type="checkbox" [checked]="proCheck"> ขอบเขตจังหวัด
+                <input (change)="onCheckJson('pro', $event.target.checked)" type="checkbox" [checked]="proCheck">
+                ขอบเขตจังหวัด
               </label>
               <div *ngIf="proCheck">
                 <img src="http://www3.cgistln.nu.ac.th/geoserver/wms?service=WMS&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=gistdata:province">
@@ -58,7 +74,8 @@
 
             <div>
               <label>
-                <input (change)="onCheckJson('amp', $event.target.checked)" type="checkbox" [checked]="ampCheck"> ขอบเขตอำเภอ
+                <input (change)="onCheckJson('amp', $event.target.checked)" type="checkbox" [checked]="ampCheck">
+                ขอบเขตอำเภอ
               </label>
               <div *ngIf="ampCheck">
                 <img src="http://www3.cgistln.nu.ac.th/geoserver/wms?service=WMS&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=gistdata:amphoe">
@@ -67,7 +84,8 @@
 
             <div>
               <label>
-                <input (change)="onCheckJson('tam', $event.target.checked)" type="checkbox" [checked]="tamCheck"> ขอบเขตตำบล
+                <input (change)="onCheckJson('tam', $event.target.checked)" type="checkbox" [checked]="tamCheck">
+                ขอบเขตตำบล
               </label>
               <div *ngIf="tamCheck">
                 <img src="http://www3.cgistln.nu.ac.th/geoserver/wms?service=WMS&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=gistdata:tambon">
@@ -116,13 +134,11 @@
     <div class="ex3">
       <div class="media text-muted pt-3" *ngFor="let p of parcelBuff; let i = index">
         <!-- <img data-src="holder.js/32x32?theme=thumb&bg=007bff&fg=007bff&size=1" alt="" class="mr-2 rounded"> -->
-        <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray" (click)="onClickList(p.geometry.coordinates[0][0],p.properties.cen_y,p.properties.cen_x,p.properties.hs_no,p.properties.building_c)">
+        <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray" (click)="onClickList(p.geometry.coordinates[0][0],p.properties.cen_y,p.properties.cen_x,p.properties.hs_no,p.properties.commu_name)">
           <div class="d-flex justify-content-between align-items-center w-100">
-            <strong class="text-gray-dark">{{i+1}}. อาคารเลขที่ {{p.properties.hs_no}}
-            </strong>
-            <!-- <a href="#">{{i}}</a> -->
+            <strong class="text-gray-dark">{{i+1}}. อาคารเลขที่ <a href="#">{{p.properties.hs_no}}</a></strong>
           </div>
-          <span class="d-block">{{p.properties.building_c}}</span>
+          <span class="d-block">ชุมชน{{p.properties.commu_name}}</span>
         </div>
       </div>
 

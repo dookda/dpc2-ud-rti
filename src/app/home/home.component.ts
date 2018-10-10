@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import * as L from 'leaflet';
 import { DataService } from '../services/data.service';
+import { resolve, reject } from 'q';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -37,6 +38,9 @@ export class HomeComponent implements OnInit {
   public p: any;
   public d: any;
 
+  public houseData: any;
+  public term: any;
+
   constructor(
     private dataService: DataService
   ) {
@@ -48,6 +52,8 @@ export class HomeComponent implements OnInit {
     this.loadmap();
     // this.loadParcel();
     // this.loadCommu();
+
+    // this.searchHouse();
   }
 
   loadmap() {
@@ -79,8 +85,8 @@ export class HomeComponent implements OnInit {
 
     // overlay map
     const mapUrl = 'http://map.nu.ac.th/geoserver-hgis/ows?';
-    // const cgiUrl = 'http://www.cgi.uru.ac.th/geoserver/ows?';
-    const cgiUrl = 'http://103.40.148.133/gs-ud/ows?';
+    const cgiUrl = 'http://www.cgi.uru.ac.th/geoserver/ows?';
+    // const cgiUrl = 'http://103.40.148.133/gs-ud/ows?';
 
     this.parcel = L.tileLayer.wms(cgiUrl, {
       layers: 'udparcel:building_4326',
@@ -154,10 +160,10 @@ export class HomeComponent implements OnInit {
           if (res.totalFeatures > 0) {
             L.popup({
               maxWidth: 200, // offset: [5, -25]
-            }).setLatLng([latlng.lat, latlng.lng]).setContent('<span id="kanit13">build</span>: ' +
+            }).setLatLng([latlng.lat, latlng.lng]).setContent('<span id="kanit13">อาคารเลขที่:</span>: ' +
               res.features[0].properties.hs_no +
-              '<br> <span id="kanit13">hs-no</span>: ' +
-              res.features[0].properties.building_c).openOn(this.map);
+              '<br> <span id="kanit13">ชื่อชุมชน:</span>: ' +
+              res.features[0].properties.commu_name).openOn(this.map);
           }
         });
         // buffer
@@ -175,8 +181,8 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  loadDataBuffer(lon: number, lat: number, r: number) {
-    this.dataService.getParcelBuffer(lon, lat, r).then((res: any) => {
+  async loadDataBuffer(lon: number, lat: number, r: number) {
+    await this.dataService.getParcelBuffer(lon, lat, r).then((res: any) => {
       this.parcelBuff = res.features;
       this.showWfs(res.features);
     });
@@ -222,6 +228,7 @@ export class HomeComponent implements OnInit {
   }
 
   selectBuffer(b) {
+    this.parcelBuff = [];
     this.radius = b;
     if (this.circle) {
       this.map.removeLayer(this.circle);
@@ -229,9 +236,18 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  onHouseClick(a: any) {
+    this.map.setView([a.cen_y, a.cen_x], 18);
+    L.popup({
+      maxWidth: 200,
+    }).setLatLng([a.cen_y, a.cen_x])
+      .setContent('<span id="kanit13">อาคารเลขที่: </span>: ' + a.hs_no +
+        '<br> <span id="kanit13">ชื่อชุมชน: </span>: ' + a.commu_name)
+      .openOn(this.map);
+  }
+
   onClickList(p: any, lat: number, lon: number, txt1: any, txt2: any) {
     const arr = [];
-    // console.log(p);
     for (const i of p) {
       if (i) {
         const a = i.reverse();
@@ -243,9 +259,33 @@ export class HomeComponent implements OnInit {
       maxWidth: 200, // offset: [5, -25]
     }).setLatLng([lat, lon])
       .setContent('<span id="kanit13">อาคารเลขที่: </span>: ' + txt1 +
-        '<br> <span id="kanit13">รหัส: </span>: ' + txt2)
+        '<br> <span id="kanit13">ชื่อชุมชน: </span>: ' + txt2)
       .openOn(this.map);
+  }
 
+  async searchHouse(e) {
+    let val1;
+    let val2;
+
+    if (e !== '') {
+      const txt = e.split(' ');
+      if (txt.length === 1) {
+        val1 = txt[0];
+        val2 = '';
+      } else {
+        val1 = txt[0];
+        val2 = txt[1];
+      }
+
+      await this.dataService.getLikeParcel(val1, val2).then((res: any) => {
+        console.log('tt');
+        this.houseData = res;
+      }, error => {
+        console.log(error);
+      });
+    } else {
+      console.log('null');
+    }
   }
 
   onCheckJson(lyr: string, isChecked: boolean) {
