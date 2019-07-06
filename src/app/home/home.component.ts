@@ -41,6 +41,9 @@ export class HomeComponent implements OnInit {
   public houseData: any;
   public term: any;
 
+  public sumArea = 0;
+  public buildingCount = 0;
+
   constructor(
     private dataService: DataService
   ) {
@@ -185,6 +188,17 @@ export class HomeComponent implements OnInit {
     await this.dataService.getParcelBuffer(lon, lat, r).then((res: any) => {
       this.parcelBuff = res.features;
       this.showWfs(res.features);
+
+      this.sumArea = 0;
+      this.buildingCount = 0;
+
+      for (let i = 0; i < this.parcelBuff.length; i++) {
+        this.sumArea += Number(this.parcelBuff[i].properties.area);
+        this.buildingCount += 1;
+      }
+
+
+
     });
   }
 
